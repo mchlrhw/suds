@@ -58,7 +58,7 @@ enum Space {
 }
 
 impl Space {
-    pub fn is_occupied(&self) -> bool {
+    pub fn is_occupied(self) -> bool {
         match self {
             Self::Empty => false,
             _ => true,
@@ -85,6 +85,7 @@ impl From<u8> for Space {
     }
 }
 
+#[derive(Clone, Copy)]
 struct Grid {
     spaces: [Space; 81],
 }
@@ -154,22 +155,19 @@ impl Grid {
         s
     }
 
-    pub fn solve(&mut self) {
+    pub fn solve(mut self) -> Option<Self> {
         for y in 0..=8 {
             for x in 0..=8 {
-                dbg!(x, y);
-
                 let space = self.get(x, y);
                 if space.is_occupied() {
-                    dbg!(space);
                     continue;
                 }
 
                 let mut constraints = HashSet::new();
-                constraints.extend(dbg!(self.column_constraints(x)));
-                constraints.extend(dbg!(self.row_constraints(y)));
-                constraints.extend(dbg!(self.square_constraints(x, y)));
-                constraints = dbg!(constraints);
+                constraints.extend(self.column_constraints(x));
+                constraints.extend(self.row_constraints(y));
+                constraints.extend(self.square_constraints(x, y));
+                constraints = constraints;
 
                 let all_possible = {
                     let mut _set = HashSet::new();
@@ -186,16 +184,19 @@ impl Grid {
                     _set
                 };
 
-                for value in dbg!(all_possible.difference(&constraints)) {
+                for value in all_possible.difference(&constraints) {
                     self.set(x, y, *value);
-                    println!("{}", self);
-                    self.solve();
-                    self.set_empty(x, y);
+                    match self.solve() {
+                        Some(solution) => return Some(solution),
+                        None => self.set_empty(x, y),
+                    }
                 }
 
-                return
+                return None;
             }
         }
+
+        Some(self)
     }
 }
 
@@ -250,15 +251,17 @@ impl FromStr for Grid {
 
 fn main() {
     let grid = r"
-060070009
-000900020
-009004300
-020405080
-030060090
-040209070
-005800200
-090002000
-700050010";
-    let mut grid = grid.parse::<Grid>().unwrap();
-    grid.solve();
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000
+000000000";
+    let grid = grid.parse::<Grid>().unwrap();
+    println!("{}", grid);
+    let grid = grid.solve().expect("Unsolvable");
+    println!("{}", grid);
 }
