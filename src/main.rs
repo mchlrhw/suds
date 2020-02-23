@@ -102,6 +102,12 @@ impl Grid {
         self.spaces[i] = Space::Occupied(v);
     }
 
+    fn set_empty(&mut self, x: u8, y: u8) {
+        let i: usize = (x + (y * 9)).try_into().unwrap();
+
+        self.spaces[i] = Space::Empty;
+    }
+
     fn column_constraints(&self, x: u8) -> Vec<Value> {
         let mut c = vec![];
         for y in 0..=8 {
@@ -134,9 +140,9 @@ impl Grid {
 
         let mut s = vec![];
         for local_y in 0..=2 {
-            let grid_y = local_y + square_y;
+            let grid_y = local_y + (square_y * 3);
             for local_x in 0..=2 {
-                let grid_x = local_x + square_x;
+                let grid_x = local_x + (square_x * 3);
                 let val = match self.get(grid_x, grid_y) {
                     Space::Occupied(v) => v,
                     _ => continue,
@@ -155,13 +161,13 @@ impl Grid {
 
                 let space = self.get(x, y);
                 if space.is_occupied() {
-                    // XXX: assume the space is already solved
+                    dbg!(space);
                     continue;
                 }
 
                 let mut constraints = HashSet::new();
                 constraints.extend(dbg!(self.column_constraints(x)));
-                constraints.extend(dbg!(self.row_constraints(x)));
+                constraints.extend(dbg!(self.row_constraints(y)));
                 constraints.extend(dbg!(self.square_constraints(x, y)));
                 constraints = dbg!(constraints);
 
@@ -179,13 +185,15 @@ impl Grid {
 
                     _set
                 };
-                let mut available = dbg!(all_possible.difference(&constraints));
 
-                if available.clone().count() == 0 {
-                    panic!("Impossible to solve");
+                for value in dbg!(all_possible.difference(&constraints)) {
+                    self.set(x, y, *value);
+                    println!("{}", self);
+                    self.solve();
+                    self.set_empty(x, y);
                 }
 
-                self.set(x, y, *available.next().unwrap());
+                return
             }
         }
     }
@@ -242,17 +250,15 @@ impl FromStr for Grid {
 
 fn main() {
     let grid = r"
-003020600
-900305001
-001806400
-008102900
-700000008
-006708200
-002609500
-800203009
-005010300";
+060070009
+000900020
+009004300
+020405080
+030060090
+040209070
+005800200
+090002000
+700050010";
     let mut grid = grid.parse::<Grid>().unwrap();
-    println!("{}", grid);
     grid.solve();
-    println!("{}", grid);
 }
