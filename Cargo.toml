@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 clap = { git = "https://github.com/clap-rs/clap/" }
+crossterm = "0.16"
+fehler = "1.0.0-alpha.2"
