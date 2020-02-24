@@ -1,8 +1,6 @@
-use std::collections::HashSet;
-use std::convert::TryInto;
-use std::fmt;
-use std::num::ParseIntError;
-use std::str::FromStr;
+use std::{collections::HashSet, convert::TryInto, fmt, num::ParseIntError, str::FromStr};
+
+use clap::Clap;
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 enum Value {
@@ -91,6 +89,12 @@ struct Grid {
 }
 
 impl Grid {
+    pub fn empty() -> Self {
+        Self {
+            spaces: [Space::Empty; 81],
+        }
+    }
+
     fn get(&self, x: u8, y: u8) -> Space {
         let i: usize = (x + (y * 9)).try_into().unwrap();
 
@@ -249,19 +253,31 @@ impl FromStr for Grid {
     }
 }
 
+/// Generate, solve and explore sudoku from the command line
+#[derive(Clap)]
+#[clap()]
+struct Opts {
+    #[clap(subcommand)]
+    subcmd: Subcommand,
+}
+
+#[derive(Clap)]
+enum Subcommand {
+    #[clap(name = "gen")]
+    Generate(Generate),
+}
+
+/// Generate a new sudoku puzzle
+#[derive(Clap)]
+struct Generate {}
+
 fn main() {
-    let grid = r"
-000000000
-000000000
-000000000
-000000000
-000000000
-000000000
-000000000
-000000000
-000000000";
-    let grid = grid.parse::<Grid>().unwrap();
-    println!("{}", grid);
-    let grid = grid.solve().expect("Unsolvable");
-    println!("{}", grid);
+    let opts = Opts::parse();
+    match opts.subcmd {
+        Subcommand::Generate(_) => {
+            let grid = Grid::empty();
+            let grid = grid.solve().expect("Unsolvable");
+            println!("{}", grid);
+        }
+    }
 }
