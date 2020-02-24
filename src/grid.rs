@@ -125,6 +125,20 @@ impl Grid {
     }
 }
 
+impl PartialEq for Grid {
+    fn eq(&self, other: &Self) -> bool {
+        self.spaces.iter().eq(other.spaces.iter())
+    }
+}
+
+impl Eq for Grid {}
+
+impl fmt::Debug for Grid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.spaces.to_vec())
+    }
+}
+
 impl fmt::Display for Grid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut val = String::new();
@@ -164,12 +178,90 @@ impl FromStr for Grid {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut numbers = vec![];
         for c in s.chars() {
-            if c.is_whitespace() {
+            if c.is_whitespace() || c == '|' || c == '_' {
                 continue;
             }
+            let c = if c == '.' { '0' } else { c };
             numbers.push(c.to_string().parse()?);
         }
 
         Ok(Self::from(numbers))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use fehler::throws;
+
+    use super::*;
+
+    #[test]
+    #[throws(ParseIntError)]
+    fn round_trip() {
+        #[rustfmt::skip]
+        let expected =
+r" _____________________________
+| 1  4  8 | 6  5  2 | 7  9  3 |
+| 7  9  3 | 8  4  1 | 2  5  6 |
+| 5  6  2 | 7  9  3 | 8  1  4 |
+|_____________________________|
+| 6  5  1 | 2  8  9 | 4  3  7 |
+| 9  2  7 | 1  3  4 | 5  6  8 |
+| 8  3  4 | 5  7  6 | 1  2  9 |
+|_____________________________|
+| 4  1  9 | 3  2  8 | 6  7  5 |
+| 2  8  5 | 9  6  7 | 3  4  1 |
+| 3  7  6 | 4  1  5 | 9  8  2 |
+|_____________________________|
+";
+        let grid: Grid = expected.parse()?;
+        assert_eq!(format!("{}", grid), expected);
+    }
+
+    #[test]
+    #[throws(ParseIntError)]
+    fn round_trip_empty() {
+        #[rustfmt::skip]
+        let expected =
+r" _____________________________
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+|_____________________________|
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+|_____________________________|
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+| .  .  . | .  .  . | .  .  . |
+|_____________________________|
+";
+        let grid: Grid = expected.parse()?;
+        assert_eq!(grid, Grid::empty());
+        assert_eq!(format!("{}", grid), expected);
+    }
+
+    #[test]
+    #[throws(ParseIntError)]
+    fn zeros_as_empty() {
+        #[rustfmt::skip]
+        let expected =
+r" _____________________________
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+|_____________________________|
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+|_____________________________|
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+| 0  0  0 | 0  0  0 | 0  0  0 |
+|_____________________________|
+";
+        let grid: Grid = expected.parse()?;
+        assert_eq!(grid, Grid::empty());
     }
 }
