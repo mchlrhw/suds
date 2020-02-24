@@ -17,20 +17,35 @@ struct Opts {
 enum Subcommand {
     #[clap(name = "gen")]
     Generate(Generate),
+    #[clap(name = "solve")]
+    Solve(Solve),
 }
 
 /// Generate a new sudoku puzzle
 #[derive(Clap)]
 struct Generate {}
 
-#[throws(crossterm::ErrorKind)]
+/// Solve a given sudoku puzzle
+#[derive(Clap)]
+struct Solve {
+    #[clap(short = "f", long = "file")]
+    path: Option<String>,
+}
+
+#[throws(Box<dyn std::error::Error>)]
 fn main() {
     let mut stdout = stdout();
     let opts = Opts::parse();
 
     match opts.subcmd {
         Subcommand::Generate(_) => {
-            let grid = Grid::empty();
+            todo!();
+        }
+        Subcommand::Solve(s) => {
+            let grid = match s.path {
+                Some(path) => Grid::from_file(&path)?,
+                None => Grid::empty(),
+            };
             let grid = grid.solve().expect("Unsolvable");
             for s in grid.to_styled() {
                 queue!(stdout, PrintStyledContent(s))?;

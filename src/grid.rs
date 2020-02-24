@@ -1,4 +1,14 @@
-use std::{collections::HashSet, convert::TryInto, fmt, num::ParseIntError, str::FromStr};
+use std::{
+    collections::HashSet,
+    convert::TryInto,
+    fmt,
+    fs::File,
+    io::{prelude::*, BufReader},
+    num::ParseIntError,
+    str::FromStr,
+};
+
+use fehler::throws;
 
 use crate::{space::Space, value::Value};
 
@@ -186,6 +196,18 @@ impl FromStr for Grid {
         }
 
         Ok(Self::from(numbers))
+    }
+}
+
+impl Grid {
+    #[throws(Box<dyn std::error::Error>)]
+    pub fn from_file(path: &str) -> Self {
+        let file = File::open(path)?;
+        let mut buf_reader = BufReader::new(file);
+        let mut contents = String::new();
+        buf_reader.read_to_string(&mut contents)?;
+
+        Self::from_str(&contents)?
     }
 }
 
