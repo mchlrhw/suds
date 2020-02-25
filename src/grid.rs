@@ -9,10 +9,27 @@ use std::{
 };
 
 use fehler::throws;
+use lazy_static::lazy_static;
 
 use crate::{space::Space, value::Value};
 
 mod styled;
+
+lazy_static! {
+    static ref ALL_VALUES: HashSet<Value> = vec![
+        Value::One,
+        Value::Two,
+        Value::Three,
+        Value::Four,
+        Value::Five,
+        Value::Six,
+        Value::Seven,
+        Value::Eight,
+        Value::Nine,
+    ]
+    .into_iter()
+    .collect();
+}
 
 #[derive(Clone, Copy)]
 pub struct Grid {
@@ -104,22 +121,7 @@ impl Grid {
                 constraints.extend(self.square_constraints(x, y));
                 constraints = constraints;
 
-                let all_possible = {
-                    let mut _set = HashSet::new();
-                    _set.insert(Value::One);
-                    _set.insert(Value::Two);
-                    _set.insert(Value::Three);
-                    _set.insert(Value::Four);
-                    _set.insert(Value::Five);
-                    _set.insert(Value::Six);
-                    _set.insert(Value::Seven);
-                    _set.insert(Value::Eight);
-                    _set.insert(Value::Nine);
-
-                    _set
-                };
-
-                for value in all_possible.difference(&constraints) {
+                for value in ALL_VALUES.difference(&constraints) {
                     self.set(x, y, *value);
                     match self.solve() {
                         Some(solution) => return Some(solution),

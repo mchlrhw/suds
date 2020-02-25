@@ -8,3 +8,4 @@ edition = "2018"
 clap = { git = "https://github.com/clap-rs/clap/" }
 crossterm = "0.16"
 fehler = "1.0.0-alpha.2"
+lazy_static = "1.4"
