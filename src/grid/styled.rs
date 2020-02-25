@@ -74,7 +74,7 @@ impl Grid {
                             })
                             .attribute(Attribute::Bold),
                     },
-                    Space::Empty => style(space.to_string()).with(Color::Grey),
+                    Space::Empty => style(format!(" {} ", space)).with(Color::Grey),
                 };
                 val.push(styled);
                 if (x + 1) % 3 == 0 {

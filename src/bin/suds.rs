@@ -15,10 +15,12 @@ struct Opts {
 
 #[derive(Clap)]
 enum Subcommand {
-    #[clap(name = "gen")]
+    #[clap(name = "generate")]
     Generate(Generate),
     #[clap(name = "solve")]
     Solve(Solve),
+    #[clap(name = "explore")]
+    Explore(Explore),
 }
 
 /// Generate a new sudoku puzzle
@@ -32,6 +34,13 @@ struct Solve {
     path: Option<String>,
 }
 
+/// Explore sudoku puzzles
+#[derive(Clap)]
+struct Explore {
+    #[clap(short = "f", long = "file")]
+    path: Option<String>,
+}
+
 #[throws(Box<dyn std::error::Error>)]
 fn main() {
     let mut stdout = stdout();
@@ -41,12 +50,22 @@ fn main() {
         Subcommand::Generate(_) => {
             todo!();
         }
-        Subcommand::Solve(s) => {
-            let grid = match s.path {
+        Subcommand::Solve(c) => {
+            let grid = match c.path {
                 Some(path) => Grid::from_file(&path)?,
                 None => Grid::empty(),
             };
             let grid = grid.solve().expect("Unsolvable");
+            for s in grid.to_styled() {
+                queue!(stdout, PrintStyledContent(s))?;
+            }
+            stdout.flush()?;
+        }
+        Subcommand::Explore(c) => {
+            let grid = match c.path {
+                Some(path) => Grid::from_file(&path)?,
+                None => Grid::empty(),
+            };
             for s in grid.to_styled() {
                 queue!(stdout, PrintStyledContent(s))?;
             }
