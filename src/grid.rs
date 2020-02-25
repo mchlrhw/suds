@@ -9,27 +9,10 @@ use std::{
 };
 
 use fehler::throws;
-use lazy_static::lazy_static;
 
-use crate::{space::Space, value::Value};
+use crate::{space::Space, value::{ALL_VALUES, Value}};
 
 mod styled;
-
-lazy_static! {
-    static ref ALL_VALUES: HashSet<Value> = vec![
-        Value::One,
-        Value::Two,
-        Value::Three,
-        Value::Four,
-        Value::Five,
-        Value::Six,
-        Value::Seven,
-        Value::Eight,
-        Value::Nine,
-    ]
-    .into_iter()
-    .collect();
-}
 
 #[derive(Clone, Copy)]
 pub struct Grid {

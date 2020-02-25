@@ -1,6 +1,14 @@
-use std::fmt;
+use std::{collections::HashSet, fmt};
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
+use lazy_static::lazy_static;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
+lazy_static!{
+    pub static ref ALL_VALUES: HashSet<Value> = Value::iter().collect();
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, EnumIter)]
 pub enum Value {
     One,
     Two,
