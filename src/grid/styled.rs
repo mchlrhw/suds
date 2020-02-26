@@ -7,7 +7,7 @@ use super::Grid;
 impl Grid {
     pub fn to_styled(&self) -> Vec<StyledContent<String>> {
         let mut val = vec![];
-        val.push(style(" _____________________________\n".to_string()));
+        val.push(style(",-----------------------------,\n".to_string()));
         for y in 0..=8 {
             val.push(style('|'.to_string()));
             for x in 0..=8 {
@@ -82,10 +82,14 @@ impl Grid {
                 }
             }
             val.push(style('\n'.to_string()));
+            if y == 8 {
+                break;
+            }
             if (y + 1) % 3 == 0 {
-                val.push(style("|_____________________________|\n".to_string()));
+                val.push(style("|---------+---------+---------|\n".to_string()));
             }
         }
+        val.push(style("'-----------------------------'\n".to_string()));
 
         val
     }
