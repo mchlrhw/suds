@@ -11,13 +11,32 @@ use std::{
 
 use fehler::throws;
 
-use crate::{space::Space, value::{ALL_VALUES, Value}};
+use crate::{
+    space::Space,
+    value::{Value, ALL_VALUES},
+};
 
 mod styled;
 
 #[derive(Clone, Copy)]
 pub struct Grid {
     spaces: [Space; 81],
+}
+
+fn is_solved(spaces: Vec<Space>) -> bool {
+    let mut values = vec![];
+    for space in spaces {
+        match space {
+            Space::Empty => return false,
+            Space::Occupied(value) => values.push(value),
+        }
+    }
+    values.sort();
+
+    let mut all_values = ALL_VALUES.iter().cloned().collect::<Vec<Value>>();
+    all_values.sort();
+
+    values == all_values
 }
 
 impl Grid {
@@ -27,10 +46,63 @@ impl Grid {
         }
     }
 
+    pub fn new_solved() -> Self {
+        let grid = Self {
+            spaces: [Space::Empty; 81],
+        };
+        grid.solve().unwrap()
+    }
+
     fn get(&self, x: u8, y: u8) -> Space {
         let i: usize = (x + (y * 9)).try_into().unwrap();
 
         self.spaces[i]
+    }
+
+    fn rows(&self) -> Vec<Vec<Space>> {
+        let mut rows = vec![];
+        for y in 0..=8 {
+            let mut row = vec![];
+            for x in 0..=8 {
+                row.push(self.get(x, y));
+            }
+            rows.push(row);
+        }
+
+        rows
+    }
+
+    fn columns(&self) -> Vec<Vec<Space>> {
+        let mut columns = vec![];
+        for x in 0..=8 {
+            let mut column = vec![];
+            for y in 0..=8 {
+                column.push(self.get(x, y));
+            }
+            columns.push(column);
+        }
+
+        columns
+    }
+
+    fn squares(&self) -> Vec<Vec<Space>> {
+        let mut squares = vec![];
+        for square_y in 0..=2 {
+            for square_x in 0..=2 {
+                let mut square = vec![];
+                for local_y in 0..=2 {
+                    let grid_y = local_y + (square_y * 3);
+                    for local_x in 0..=2 {
+                        let grid_x = local_x + (square_x * 3);
+                        let val = self.get(grid_x, grid_y);
+                        square.push(val);
+                    }
+                }
+                squares.push(square)
+            }
+        }
+
+        squares
     }
 
     fn set(&mut self, x: u8, y: u8, v: Value) {
@@ -43,6 +115,16 @@ impl Grid {
         let i: usize = (x + (y * 9)).try_into().unwrap();
 
         self.spaces[i] = Space::Empty;
+    }
+
+    pub fn is_complete(&self) -> bool {
+        self.spaces.iter().all(|&s| s.is_occupied())
+    }
+
+    pub fn is_solved(&self) -> bool {
+        self.rows().iter().all(|r| is_solved(r.to_vec()))
+            && self.columns().iter().all(|c| is_solved(c.to_vec()))
+            && self.squares().iter().all(|s| is_solved(s.to_vec()))
     }
 
     fn column_constraints(&self, x: u8) -> Vec<Value> {
@@ -186,9 +268,21 @@ impl Grid {
 
 #[cfg(test)]
 mod tests {
-    use fehler::throws;
+    use test_case::test_case;
 
     use super::*;
+
+    #[test_case(Grid::empty(), false)]
+    #[test_case(Grid::new_solved(), true)]
+    fn grid_is_complete(grid: Grid, expected: bool) {
+        assert_eq!(grid.is_complete(), expected);
+    }
+
+    #[test_case(Grid::empty(), false)]
+    #[test_case(Grid::new_solved(), true)]
+    fn grid_is_solved(grid: Grid, expected: bool) {
+        assert_eq!(grid.is_solved(), expected);
+    }
 
     #[test]
     #[throws(ParseIntError)]

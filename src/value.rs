@@ -4,11 +4,11 @@ use lazy_static::lazy_static;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-lazy_static!{
+lazy_static! {
     pub static ref ALL_VALUES: HashSet<Value> = Value::iter().collect();
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, EnumIter)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Debug, EnumIter)]
 pub enum Value {
     One,
     Two,

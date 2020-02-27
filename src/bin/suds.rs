@@ -70,6 +70,10 @@ fn main() {
                 queue!(stdout, PrintStyledContent(s))?;
             }
             stdout.flush()?;
+            println!();
+            println!("Complete: {}", grid.is_complete());
+            println!("Solved: {}", grid.is_solved());
+            println!();
         }
     }
 }
