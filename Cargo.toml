@@ -5,6 +5,7 @@ authors = ["mchlrhw <4028654+mchlrhw@users.noreply.github.com>"]
 edition = "2018"
 
 [dev-dependencies]
+criterion = "0.3"
 test-case = "1.0"
 
 [dependencies]
@@ -14,3 +15,7 @@ fehler = "1.0.0-alpha.2"
 lazy_static = "1.4"
 strum = "0.17"
 strum_macros = "0.17"
+
+[[bench]]
+name = "benchmark"
+harness = false
