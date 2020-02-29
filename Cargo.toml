@@ -13,6 +13,7 @@ clap = { git = "https://github.com/clap-rs/clap/" }
 crossterm = "0.16"
 fehler = "1.0.0-alpha.2"
 lazy_static = "1.4"
+rand = "0.7"
 strum = "0.17"
 strum_macros = "0.17"
 

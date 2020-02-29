@@ -1,6 +1,6 @@
 use std::io::{stdout, Write};
 
-use clap::Clap;
+use clap::{arg_enum, Clap};
 use crossterm::{queue, style::PrintStyledContent};
 use fehler::throws;
 use suds::Grid;
@@ -27,11 +27,21 @@ enum Subcommand {
 #[derive(Clap)]
 struct Generate {}
 
+arg_enum! {
+    #[derive(Debug)]
+    enum Strategy {
+        Backtracking,
+        Stochastic
+    }
+}
+
 /// Solve a given sudoku puzzle
 #[derive(Clap)]
 struct Solve {
     #[clap(short = "f", long = "file")]
     path: Option<String>,
+    #[clap(short = "s", long = "strategy", possible_values = &Strategy::variants(), default_value = "backtracking", case_insensitive = true)]
+    strategy: Strategy,
 }
 
 /// Explore sudoku puzzles
@@ -55,7 +65,10 @@ fn main() {
                 Some(path) => Grid::from_file(&path)?,
                 None => Grid::empty(),
             };
-            let grid = grid.solve().expect("Unsolvable");
+            let grid = match c.strategy {
+                Strategy::Backtracking => grid.backtracking_solve().expect("Unsolvable"),
+                Strategy::Stochastic => grid.stochastic_solve().expect("Unsolvable"),
+            };
             for s in grid.to_styled() {
                 queue!(stdout, PrintStyledContent(s))?;
             }

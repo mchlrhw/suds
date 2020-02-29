@@ -1,5 +1,5 @@
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     convert::TryInto,
     fmt,
     fs::File,
@@ -10,6 +10,7 @@ use std::{
 };
 
 use fehler::throws;
+use rand::prelude::*;
 
 use crate::{
     space::Space,
@@ -173,7 +174,7 @@ impl Grid {
         s
     }
 
-    pub fn solve(mut self) -> Option<Self> {
+    pub fn backtracking_solve(mut self) -> Option<Self> {
         for y in 0..=8 {
             for x in 0..=8 {
                 let space = self.get(x, y);
@@ -200,6 +201,51 @@ impl Grid {
         }
 
         Some(self)
+    }
+
+    pub fn stochastic_solve(mut self) -> Option<Self> {
+        // 1) Find out if it's solvable, return early if not
+        // TODO
+        // 2) Determine which numbers are missing from the grid
+        let mut counts: HashMap<Value, u8> = HashMap::new();
+        for space in self.spaces.iter() {
+            match space {
+                Space::Empty => continue,
+                Space::Occupied(value) => *counts.entry(*value).or_insert(0) += 1,
+            }
+        }
+        let mut values = vec![];
+        for value in ALL_VALUES.iter() {
+            let missing = match counts.get(value) {
+                Some(count) => 9 - count,
+                None => 9,
+            };
+            for _ in 0..missing {
+                values.push(value);
+            }
+        }
+        // 3) Shuffle the numbers and insert into the empty spaces
+        let self_clone = self.clone();
+        loop {
+            let mut values_clone = values.clone();
+            values_clone.shuffle(&mut rand::thread_rng());
+
+            for (i, space) in self_clone.spaces.iter().enumerate() {
+                match space {
+                    Space::Empty => self.spaces[i] = Space::Occupied(*values_clone.pop().unwrap()),
+                    Space::Occupied(_) => continue,
+                }
+            }
+            // 4) Check for solved state, return if true, loop if not
+            if self.is_solved() {
+                return Some(self);
+            }
+            println!("{}", self);
+        }
+    }
+
+    pub fn solve(self) -> Option<Self> {
+        self.backtracking_solve()
     }
 }
 

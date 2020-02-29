@@ -27,7 +27,7 @@ impl Grid {
 
         for y in 0..9 {
             val.push(style(OUTSIDE_DOWN.to_string()));
-            for x in 0..9{
+            for x in 0..9 {
                 let space = self.get(x, y);
                 let styled = match space {
                     Space::Occupied(v) => match v {
