@@ -1,5 +1,6 @@
 use std::{collections::HashSet, fmt};
 
+use crossterm::style::Color;
 use lazy_static::lazy_static;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -19,6 +20,54 @@ pub enum Value {
     Seven,
     Eight,
     Nine,
+}
+
+impl Value {
+    pub fn color(&self) -> Color {
+        match self {
+            Self::One => Color::Rgb { r: 255, g: 0, b: 0 },
+            Self::Two => Color::Rgb {
+                r: 255,
+                g: 120,
+                b: 0,
+            },
+            Self::Three => Color::Rgb {
+                r: 255,
+                g: 255,
+                b: 0,
+            },
+            Self::Four => Color::Rgb {
+                r: 120,
+                g: 255,
+                b: 0,
+            },
+            Self::Five => Color::Rgb {
+                r: 0,
+                g: 180,
+                b: 80,
+            },
+            Self::Six => Color::Rgb {
+                r: 0,
+                g: 150,
+                b: 255,
+            },
+            Self::Seven => Color::Rgb {
+                r: 60,
+                g: 80,
+                b: 220,
+            },
+            Self::Eight => Color::Rgb {
+                r: 140,
+                g: 40,
+                b: 255,
+            },
+            Self::Nine => Color::Rgb {
+                r: 240,
+                g: 20,
+                b: 255,
+            },
+        }
+    }
 }
 
 impl fmt::Display for Value {
