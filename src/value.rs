@@ -23,7 +23,7 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn color(&self) -> Color {
+    pub fn color(self) -> Color {
         match self {
             Self::One => Color::Rgb { r: 255, g: 0, b: 0 },
             Self::Two => Color::Rgb {

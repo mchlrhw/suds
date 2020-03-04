@@ -4,15 +4,15 @@ use crate::space::Space;
 
 use super::Grid;
 
-const TOP_LEFT: char = ',';
-const TOP_RIGHT: char = ',';
-const BOTTOM_LEFT: char = '\'';
-const BOTTOM_RIGHT: char = '\'';
-const OUTSIDE_ACROSS: char = '-';
-const INSIDE_ACROSS: char = '-';
-const OUTSIDE_DOWN: char = '|';
-const INSIDE_DOWN: char = '|';
-const INSIDE_INTERSECTION: char = '+';
+const TOP_LEFT: char = '┌';
+const TOP_RIGHT: char = '┐';
+const BOTTOM_LEFT: char = '└';
+const BOTTOM_RIGHT: char = '┘';
+const OUTSIDE_ACROSS: char = '─';
+const INSIDE_ACROSS: char = '┄';
+const OUTSIDE_DOWN: char = '│';
+const INSIDE_DOWN: char = '┆';
+const INSIDE_INTERSECTION: char = '┼';
 
 impl Grid {
     pub fn to_styled(&self) -> Vec<StyledContent<String>> {
